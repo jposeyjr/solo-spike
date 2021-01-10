@@ -3,7 +3,7 @@
   const GHOST_SIZE = PACMAN_SIZE * 1.25;
   const DOT_SIZE = 0.1;
   const POWER_DOT = DOT_SIZE * 1.5;
-  const UP = new THREE.Vector3(0, 0, 1);
+  const UP = new THREE.Vector3(0, 0, -1);
   const LEFT = new THREE.Vector3(-1, 0, 0);
   const TOP = new THREE.Vector3(0, 1, 0);
   const RIGHT = new THREE.Vector3(1, 0, 0);
@@ -32,7 +32,7 @@
     '# . . . . . . . . . . . . # # . . . . . . . . . . . . #',
     '# . # # # # . # # # # # . # # . # # # # # . # # # # . #',
     '# . # # # # . # # # # # . # # . # # # # # . # # # # . #',
-    '# o . . # # . . . . . . . P   . . . . . . . # # . . o #',
+    '# o . . # # . . . . . . o P   . . . . . . . # # . . o #',
     '# # # . # # . # # . # # # # # # # # . # # . # # . # # #',
     '# # # . # # . # # . # # # # # # # # . # # . # # . # # #',
     '# . . . . . . # # . . . . # # . . . . # # . . . . . . #',
@@ -41,8 +41,10 @@
     '# . . . . . . . . . . . . . . . . . . . . . . . . . . #',
     '# # # # # # # # # # # # # # # # # # # # # # # # # # # #',
   ];
-  let pacmanSpeed = 2;
+  //globals for now as it is the easiest way and time is a factor
+  let pacmanSpeed = 1.7;
   let ghostSpeed = 1.5;
+  let numberOfGhosts = 0;
 
   const createMap = function (scene, levelDefinition) {
     const map = {};
@@ -56,24 +58,21 @@
 
     let x, y;
     for (let row = 0; row < levelDefinition.length; row++) {
-      // Set the coordinates of the map so that they match the
-      // coordinate system for objects.
+      //match grid to objects
       y = -row;
 
       map[y] = {};
 
-      // Get the length of the longest row in the level definition.
+      // Get the length of the longest row in the gird
       const length = Math.floor(levelDefinition[row].length / 2);
-      //map.right = Math.max(map.right, length - 1);
       map.right = Math.max(map.right, length);
 
-      // Skip every second element, which is just a space for readability.
       for (let column = 0; column < levelDefinition[row].length; column += 2) {
         x = Math.floor(column / 2);
 
         const cell = levelDefinition[row][column];
         let object = null;
-
+        //generate cells by calling create Blah for the matching char
         if (cell === '#') {
           object = createWall();
         } else if (cell === '.') {
@@ -101,18 +100,19 @@
     return map;
   };
 
-  const getAt = function (map, position) {
+  const getPos = function (map, position) {
     const x = Math.round(position.x),
       y = Math.round(position.y);
     return map[y] && map[y][x];
   };
 
   const isWall = function (map, position) {
-    const cell = getAt(map, position);
+    const cell = getPos(map, position);
     return cell && cell.isWall === true;
   };
 
-  const removeAt = function (map, scene, position) {
+  //need the scene here even though it is not directly used, it is used to get the object
+  const hideElement = function (map, scene, position) {
     const x = Math.round(position.x),
       y = Math.round(position.y);
     if (map[y] && map[y][x]) {
@@ -128,7 +128,6 @@
     return function () {
       const wall = new THREE.Mesh(wallGeometry, wallMaterial);
       wall.isWall = true;
-
       return wall;
     };
   })();
@@ -162,7 +161,6 @@
     renderer.setClearColor('black', 1.0);
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
-
     return renderer;
   };
 
@@ -179,15 +177,15 @@
   };
 
   const createHudCamera = function (map) {
-    const halfWidth = (map.right - map.left) / 2,
-      halfHeight = (map.top - map.bottom) / 2;
+    const halfWidth = (map.right - map.left) / 2;
+    const halfHeight = (map.top - map.bottom) / 2;
 
     const hudCamera = new THREE.OrthographicCamera(
       -halfWidth,
       halfWidth,
       halfHeight,
       -halfHeight,
-      1,
+      1.1,
       100
     );
     hudCamera.position.copy(new THREE.Vector3(map.centerX, map.centerY, 10));
@@ -197,12 +195,12 @@
   };
 
   const renderHud = function (renderer, hudCamera, scene) {
-    // Increase size of pacman and dots in HUD to make them easier to see.
+    // Increase size of the dots in HUD to make them easier to see.
     scene.children.forEach(function (object) {
-      if (object.isWall !== true) object.scale.set(2.5, 2.5, 2.5);
+      if (object.isWall !== true) object.scale.set(2.3, 2.3, 2.3);
     });
 
-    // Only render in the bottom left 200x200 square of the screen.
+    //render to bottom left 200x200 area
     renderer.setScissorTest(true);
     renderer.setScissor(10, 10, 200, 200);
     renderer.setViewport(10, 10, 200, 200);
@@ -268,7 +266,7 @@
       ghost.isGhost = true;
       ghost.isWrapper = true;
       ghost.isAfraid = false;
-
+      ghost.number = numberOfGhosts;
       ghost.position.copy(position);
       ghost.direction = new THREE.Vector3(-1, 0, 0);
       scene.add(ghost);
@@ -349,7 +347,7 @@
 
     const map = createMap(scene, GRID);
     const camera = new THREE.PerspectiveCamera(
-      90,
+      75,
       window.innerWidth / window.innerHeight,
       0.1,
       2000
@@ -363,8 +361,7 @@
 
     const pacman = createPacman(scene, map.pacmanSpawn);
 
-    let ghostSpawnTime = -8;
-    let numberOfGhosts = 0;
+    let ghostSpawnTime = -6;
 
     let won = false;
     let lost = false;
@@ -397,7 +394,7 @@
       life.className = 'life';
     }
     let numDotsEaten = 0;
-    let score = 1;
+    let score = 0;
     const scoreDisplay = document.getElementById('score');
     const update = function (delta, now) {
       updatePacman(delta, now);
@@ -418,7 +415,7 @@
         }
       }
 
-      if (numberOfGhosts < 4 && now - ghostSpawnTime > 8) {
+      if (numberOfGhosts < 4 && now - ghostSpawnTime > 6) {
         if (numberOfGhosts === 0) {
           createGhost(scene, map.ghostSpawn, 0xd03e19);
           numberOfGhosts++;
@@ -465,7 +462,7 @@
     };
 
     const updatePacman = function (delta, now) {
-      if (!won && !lost && (keys['W'] || keys['S'])) {
+      if (!won && !lost) {
         chompSound.play();
       } else {
         chompSound.pause();
@@ -479,8 +476,7 @@
         won = true;
         wonTime = now;
 
-        const text = showText('You won =D', 1, now);
-
+        showText('You won =D', 1, now);
         levelStartSound.play();
       }
 
@@ -501,6 +497,7 @@
         won = false;
         numDotsEaten = 0;
         numberOfGhosts = 0;
+        score = 0;
       }
 
       if (lives > 0 && lost && now - lostTime > 4) {
@@ -532,9 +529,14 @@
     const movePacman = function (delta) {
       pacman.up.copy(pacman.direction).applyAxisAngle(UP, -Math.PI / 2);
       pacman.lookAt(_lookAt.copy(pacman.position).add(UP));
-      if (keys['W']) {
-        pacman.translateOnAxis(LEFT, pacmanSpeed * delta);
-        pacman.distanceMoved += pacmanSpeed * delta;
+      let currentPosition = new THREE.Vector3();
+      if (lives > 0) {
+        // pacman.translateOnAxis(LEFT, pacmanSpeed * delta);
+        pacman.translateOnAxis(LEFT, delta * pacmanSpeed);
+        currentPosition
+          .copy(pacman.position)
+          .addScaledVector(pacman.direction, 0.5)
+          .round();
       }
       if (keys['A']) {
         pacman.direction.applyAxisAngle(UP, (Math.PI / 2) * delta);
@@ -576,9 +578,9 @@
         pacman.position.y = bottomSide.y + 0.5 + PACMAN_SIZE;
       }
 
-      const cell = getAt(map, pacman.position);
+      const cell = getPos(map, pacman.position);
       if (cell && cell.isDot === true && cell.visible === true) {
-        removeAt(map, scene, pacman.position);
+        hideElement(map, scene, pacman.position);
         numDotsEaten += 1;
         score += 1;
         scoreDisplay.textContent = `Score: ${score}`;
@@ -586,7 +588,7 @@
 
       pacman.atePellet = false;
       if (cell && cell.isPowerPellet === true && cell.visible === true) {
-        removeAt(map, scene, pacman.position);
+        hideElement(map, scene, pacman.position);
         pacman.atePellet = true;
 
         eatGhost.play();
@@ -624,15 +626,21 @@
       if (pacman.atePellet === true) {
         ghost.isAfraid = true;
         ghost.becameAfraidTime = now;
-
-        ghost.material.color.setStyle(0xffffff);
+        ghost.material.color.setStyle('white');
       }
 
       // Make ghosts not afraid after 10 seconds
       if (ghost.isAfraid && now - ghost.becameAfraidTime > 10) {
         ghost.isAfraid = false;
-
-        ghost.material.color.setStyle('red');
+        if (ghost.number === 0) {
+          ghost.material.color.setStyle('#d03e19');
+        } else if (ghost.number === 1) {
+          ghost.material.color.setStyle('#db851c');
+        } else if (ghost.number === 2) {
+          ghost.material.color.setStyle('#ea82e5');
+        } else if (ghost.number === 3) {
+          ghost.material.color.setStyle('#46bfee');
+        }
       }
 
       moveGhost(ghost, delta);
