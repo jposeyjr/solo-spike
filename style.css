@@ -1,0 +1,26 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#lives {
+  position: absolute;
+  top: 2em;
+  right: 2em;
+}
+
+img {
+  max-width: 50px;
+  max-height: 50px;
+}
+
+#score {
+  background-color: black;
+  color: white;
+  font-size: 2.4em;
+  position: absolute;
+  top: 0.2em;
+  left: 0.3em;
+}
