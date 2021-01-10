@@ -532,11 +532,13 @@
       let currentPosition = new THREE.Vector3();
       if (lives > 0) {
         // pacman.translateOnAxis(LEFT, pacmanSpeed * delta);
+        // pacman.distanceMoved += pacmanSpeed * delta;
         pacman.translateOnAxis(LEFT, delta * pacmanSpeed);
         currentPosition
           .copy(pacman.position)
           .addScaledVector(pacman.direction, 0.5)
           .round();
+        pacman.distanceMoved += pacmanSpeed * delta;
       }
       if (keys['A']) {
         pacman.direction.applyAxisAngle(UP, (Math.PI / 2) * delta);
