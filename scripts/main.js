@@ -45,6 +45,7 @@
   let pacmanSpeed = 1.7;
   let ghostSpeed = 1.5;
   let numberOfGhosts = 0;
+  let stats;
 
   const createMap = function (scene, levelDefinition) {
     const map = {};
@@ -667,6 +668,10 @@
       }
     };
 
+    //adding fps to the scene
+    stats = createStats();
+    document.body.appendChild(stats.dom);
+
     const moveGhost = (function () {
       const previousPosition = new THREE.Vector3();
       const currentPosition = new THREE.Vector3();
@@ -721,7 +726,7 @@
     // Main game loop
     animationLoop(function (delta, now) {
       update(delta, now);
-
+      stats.update();
       // Render main view
       renderer.setViewport(
         0,
@@ -734,7 +739,16 @@
       // Render HUD
       renderHud(renderer, hudCamera, scene);
     });
-  };
+  }; //end main
+
+  function createStats() {
+    const stats = new Stats();
+    stats.setMode(0);
+    stats.domElement.style.position = 'fixed';
+    stats.domElement.style.left = '93%';
+    stats.domElement.style.top = '90%';
+    return stats;
+  }
 
   main();
 })();

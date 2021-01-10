@@ -11,3 +11,4 @@ This game was made as a spike to learn to add graphics to my react capstone proj
 ## Credits
 
 classgaming.cc for the sounds & graphics
+Three.js for an amazing program and stats
