@@ -515,7 +515,6 @@
           Math.floor((angle / Math.PI) * pacman.frames.length)
         );
         pacman.geometry = pacman.frames[frame];
-        main();
       } else {
         const maxAngle = Math.PI / 4;
         let angle = (pacman.distanceMoved * 2) % (maxAngle * 2);
