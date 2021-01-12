@@ -550,7 +550,6 @@
         pacman.translateOnAxis(LEFT, -pacmanSpeed * delta);
         pacman.distanceMoved += pacmanSpeed * delta;
       }
-
       const leftSide = pacman.position
         .clone()
         .addScaledVector(LEFT, PACMAN_SIZE)
