@@ -32,7 +32,7 @@
     '# . . . . . . . . . . . . # # . . . . . . . . . . . . #',
     '# . # # # # . # # # # # . # # . # # # # # . # # # # . #',
     '# . # # # # . # # # # # . # # . # # # # # . # # # # . #',
-    '# o . . # # . . . . . . o P   . . . . . . . # # . . o #',
+    '# o . . # # . . . . . . . P   . . . . . . . # # . . o #',
     '# # # . # # . # # . # # # # # # # # . # # . # # . # # #',
     '# # # . # # . # # . # # # # # # # # . # # . # # . # # #',
     '# . . . . . . # # . . . . # # . . . . # # . . . . . . #',
@@ -390,7 +390,7 @@
     const livesContainer = document.getElementById('lives');
     for (let i = 0; i < lives; i++) {
       const life = document.createElement('img');
-      life.src = '../images/pacman.png';
+      life.src = '/images/pacman.png';
       livesContainer.appendChild(life);
       life.className = 'life';
     }
