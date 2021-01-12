@@ -368,20 +368,20 @@
     let lost = false;
     let lostTime, wonTime;
 
-    const chompSound = new Audio('../sounds/pacman_chomp.mp3');
+    const chompSound = new Audio('pacman_chomp.mp3');
     chompSound.volume = 0.3;
     chompSound.loop = true;
     chompSound.preload = 'auto';
 
-    const levelStartSound = new Audio('../sounds/pacman_beginning.mp3');
+    const levelStartSound = new Audio('pacman_beginning.mp3');
     levelStartSound.preload = 'auto';
 
     levelStartSound.autoplay = true;
 
-    const deathSound = new Audio('../sounds/pacman_death.mp3');
+    const deathSound = new Audio('pacman_death.mp3');
     deathSound.preload = 'auto';
 
-    const eatGhost = new Audio('../sounds/pacman_eatghost.mp3');
+    const eatGhost = new Audio('pacman_eatghost.mp3');
     eatGhost.preload = 'auto';
 
     const remove = [];
@@ -390,7 +390,7 @@
     const livesContainer = document.getElementById('lives');
     for (let i = 0; i < lives; i++) {
       const life = document.createElement('img');
-      life.src = '../images/pacman.png';
+      life.src = 'pacman.png';
       livesContainer.appendChild(life);
       life.className = 'life';
     }
